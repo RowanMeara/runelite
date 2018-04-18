@@ -401,36 +401,38 @@ public class MotherlodePlugin extends Plugin
 		return true;
 	}
 
-    /**
-     * Returns the floor the player is currently on. 0 means floor 0, 1 means floor 1. Floor 1 is only accessible from
-     * 72 mining.
-     * @return
-     */
-    public int getPlayerFloor() {
-        if (Perspective.getTileHeight(client, client.getLocalPlayer().getLocalLocation().getX(),
-                client.getLocalPlayer().getLocalLocation().getY(), 0) < -500)
-        {
-            return 1;
-        }
-        else
-        {
-            return 0;
-        }
-    }
+	/**
+	 * Returns the floor the player is currently on. 0 means floor 0, 1 means floor 1. Floor 1 is only accessible from
+	 * 72 mining.
+	 * @return
+	 */
+	public int getPlayerFloor()
+	{
+		if (Perspective.getTileHeight(client, client.getLocalPlayer().getLocalLocation().getX(),
+				client.getLocalPlayer().getLocalLocation().getY(), 0) < -500)
+		{
+			return 1;
+		}
+		else
+		{
+			return 0;
+		}
+	}
 
-    /**
-     * Returns the floor the vein is currently on. 0 means floor 0, 1 means floor 1. Floor 1 is only accessible from
-     * 72 mining.
-     * @return
-     */
-    public int getVeinFloor(WallObject vein) {
-        if (Perspective.getTileHeight(client, vein.getX(), vein.getY(), vein.getPlane()) < -500)
-        {
-            return 1;
-        }
-        else
-        {
-            return 0;
-        }
-    }
+	/**
+	 * Returns the floor the vein is currently on. 0 means floor 0, 1 means floor 1. Floor 1 is only accessible from
+	 * 72 mining.
+	 * @return
+	 */
+	public int getVeinFloor(WallObject vein)
+	{
+		if (Perspective.getTileHeight(client, vein.getX(), vein.getY(), vein.getPlane()) < -500)
+		{
+			return 1;
+		}
+		else
+		{
+			return 0;
+		}
+	}
 }
