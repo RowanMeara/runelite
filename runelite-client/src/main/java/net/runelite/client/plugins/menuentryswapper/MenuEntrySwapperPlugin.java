@@ -27,6 +27,8 @@ package net.runelite.client.plugins.menuentryswapper;
 
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Provides;
+
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import javax.inject.Inject;
@@ -328,7 +330,10 @@ public class MenuEntrySwapperPlugin extends Plugin
 		int itemId = event.getIdentifier();
 		String option = Text.removeTags(event.getOption()).toLowerCase();
 		String target = Text.removeTags(event.getTarget()).toLowerCase();
-
+		if (option.equals("walk here")) {
+			System.out.println(event.getActionParam0() + " " + event.getActionParam1());
+		}
+//		System.out.println("Unswapped: " + option + " " + client.getMenuEntries().length + " " + Arrays.toString(client.getMenuEntries()));
 		if (option.equals("talk-to"))
 		{
 			if (config.swapPickpocket() && target.contains("h.a.m."))
@@ -389,6 +394,10 @@ public class MenuEntrySwapperPlugin extends Plugin
 		{
 			swap("last-destination (", option, target, false);
 		}
+		else if (config.swapPushThrough() && option.equals("push-through") && !client.getMenuEntries()[1].getOption().equals("Push-through"))
+		{
+			swap("walk here", option, "", "magical wheat", true);
+		}
 		else if (config.swapBoxTrap() && (option.equals("check") || option.equals("dismantle")))
 		{
 			swap("reset", option, target, true);
@@ -431,6 +440,7 @@ public class MenuEntrySwapperPlugin extends Plugin
 		{
 			swap("use", option, target, true);
 		}
+//		System.out.println("Swapped:   " + option + " " + client.getMenuEntries().length + " " + Arrays.toString(client.getMenuEntries()));
 	}
 
 	@Subscribe
@@ -478,10 +488,15 @@ public class MenuEntrySwapperPlugin extends Plugin
 
 	private void swap(String optionA, String optionB, String target, boolean strict)
 	{
+		swap(optionA, optionB, target, target, strict);
+	}
+
+	private void swap(String optionA, String optionB, String targetA, String targetB, boolean strict)
+	{
 		MenuEntry[] entries = client.getMenuEntries();
 
-		int idxA = searchIndex(entries, optionA, target, strict);
-		int idxB = searchIndex(entries, optionB, target, strict);
+		int idxA = searchIndex(entries, optionA, targetA, strict);
+		int idxB = searchIndex(entries, optionB, targetB, strict);
 
 		if (idxA >= 0 && idxB >= 0)
 		{
