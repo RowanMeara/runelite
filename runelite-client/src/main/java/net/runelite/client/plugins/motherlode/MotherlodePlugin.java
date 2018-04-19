@@ -53,6 +53,7 @@ import static net.runelite.api.ObjectID.ORE_VEIN_26663;
 import static net.runelite.api.ObjectID.ORE_VEIN_26664;
 import static net.runelite.api.ObjectID.ROCKFALL;
 import static net.runelite.api.ObjectID.ROCKFALL_26680;
+import net.runelite.api.Perspective;
 import net.runelite.api.Varbits;
 import net.runelite.api.WallObject;
 import net.runelite.api.events.ChatMessage;
@@ -398,5 +399,40 @@ public class MotherlodePlugin extends Plugin
 		}
 
 		return true;
+	}
+
+	/**
+	 * Returns the floor the player is currently on. 0 means floor 0, 1 means floor 1. Floor 1 is only accessible from
+	 * 72 mining.
+	 * @return
+	 */
+	public int getPlayerFloor()
+	{
+		if (Perspective.getTileHeight(client, client.getLocalPlayer().getLocalLocation().getX(),
+				client.getLocalPlayer().getLocalLocation().getY(), 0) < -500)
+		{
+			return 1;
+		}
+		else
+		{
+			return 0;
+		}
+	}
+
+	/**
+	 * Returns the floor the vein is currently on. 0 means floor 0, 1 means floor 1. Floor 1 is only accessible from
+	 * 72 mining.
+	 * @return
+	 */
+	public int getVeinFloor(WallObject vein)
+	{
+		if (Perspective.getTileHeight(client, vein.getX(), vein.getY(), vein.getPlane()) < -500)
+		{
+			return 1;
+		}
+		else
+		{
+			return 0;
+		}
 	}
 }

@@ -91,7 +91,10 @@ class MotherlodeRocksOverlay extends Overlay
 			LocalPoint location = vein.getLocalLocation();
 			if (localLocation.distanceTo(location) <= MAX_DISTANCE)
 			{
-				renderVein(graphics, vein);
+				if (plugin.getPlayerFloor() == plugin.getVeinFloor(vein))
+				{
+					renderVein(graphics, vein);
+				}
 			}
 		}
 
