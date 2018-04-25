@@ -38,6 +38,7 @@ import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.ItemComposition;
 import net.runelite.api.MessageNode;
+import net.runelite.api.Varbits;
 import net.runelite.api.events.ConfigChanged;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.SetMessage;
@@ -51,6 +52,7 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.util.StackFormatter;
 import net.runelite.http.api.hiscore.HiscoreClient;
+import net.runelite.http.api.hiscore.HiscoreEndpoint;
 import net.runelite.http.api.hiscore.HiscoreSkill;
 import net.runelite.http.api.hiscore.SingleHiscoreSkillResult;
 import net.runelite.http.api.hiscore.Skill;
@@ -282,13 +284,25 @@ public class ChatCommandsPlugin extends Plugin
 		search = SkillAbbreviations.getFullName(search);
 
 		String player;
+		HiscoreEndpoint ironmanStatus = null;
 		if (type.equals(ChatMessageType.PRIVATE_MESSAGE_SENT))
 		{
 			player = client.getLocalPlayer().getName();
+			ironmanStatus = getIronmanStatusByVarbit();
 		}
 		else
 		{
 			player = sanitize(setMessage.getName());
+			if (player.equals(client.getLocalPlayer().getName()))
+			{
+				// Get ironman btw status from varbit
+				ironmanStatus = getIronmanStatusByVarbit();
+			}
+			else
+			{
+				// Get ironman btw status from their icon in chat
+				ironmanStatus = getIronmanStatusByName(setMessage.getName());
+			}
 		}
 
 		HiscoreSkill skill;
@@ -303,7 +317,7 @@ public class ChatCommandsPlugin extends Plugin
 
 		try
 		{
-			SingleHiscoreSkillResult result = hiscoreClient.lookup(player, skill);
+			SingleHiscoreSkillResult result = hiscoreClient.lookup(player, skill, ironmanStatus);
 			Skill hiscoreSkill = result.getSkill();
 
 			String response = new ChatMessageBuilder()
@@ -365,5 +379,45 @@ public class ChatCommandsPlugin extends Plugin
 	{
 		String cleaned = lookup.contains("<img") ? lookup.substring(lookup.lastIndexOf('>') + 1) : lookup;
 		return cleaned.replace('\u00A0', ' ');
+	}
+
+	/**
+	 * Looks up the ironman status of the local player. Does NOT work on other players.
+	 * @return
+	 */
+	private HiscoreEndpoint getIronmanStatusByVarbit()
+	{
+		switch (client.getVarbitValue(Varbits.IRONMAN_STATUS.getId()))
+		{
+			case 0:
+				return HiscoreEndpoint.NORMAL;
+			case 1:
+				return HiscoreEndpoint.IRONMAN;
+			case 2:
+				return HiscoreEndpoint.ULTIMATE_IRONMAN;
+			case 3:
+				return HiscoreEndpoint.HARDCORE_IRONMAN;
+		}
+		return null;
+	}
+
+	/**
+	 * Returns the ironman status based on the symbol in the name of the player.
+	 * @param name
+	 * @return
+	 */
+	private static HiscoreEndpoint getIronmanStatusByName(String name)
+	{
+		switch (name.substring(0, 7))
+		{
+			case "<img=2>":
+				return HiscoreEndpoint.IRONMAN;
+			case "<img=3>":
+				return HiscoreEndpoint.ULTIMATE_IRONMAN;
+			case "<img=10":
+				return HiscoreEndpoint.HARDCORE_IRONMAN;
+				default:
+			return HiscoreEndpoint.NORMAL;
+		}
 	}
 }
